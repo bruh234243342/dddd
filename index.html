@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Loader Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2.5em;
+        }
+
+        .header-stats {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .controls-section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            font-size: 14px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .sort-select {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 5px;
+        }
+
+        .view-btn {
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+
+        .view-btn.active {
+            background: rgba(255,255,255,0.4);
+            border-color: white;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .button-grid.list-view {
+            grid-template-columns: 1fr;
+        }
+
+        .button-grid.list-view .game-btn {
+            justify-content: flex-start;
+            padding: 12px 15px;
+        }
+
+        .game-btn {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            color: white;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .game-btn:active {
+            transform: translateY(0);
+        }
+
+        .game-btn.hidden {
+            display: none;
+        }
+
+        .game-btn-index {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-left: auto;
+            margin-left: 8px;
+        }
+
+        .info-banner {
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .info-banner p {
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .stats {
+            color: white;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .results-info {
+            background: rgba(255,255,255,0.9);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            font-size: 18px;
+        }
+
+        .favorites-container {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .favorites-title {
+            color: white;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .fav-btn {
+            padding: 10px;
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .fav-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .fav-empty {
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            padding: 20px;
+            grid-column: 1 / -1;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Game Loader Hub</h1>
+        <div class="header-stats">
+            <span class="badge">617 Games Available</span>
+            <span class="badge" id="gameCountBadge" style="display: none;">Loaded: <span id="loadedCountBadge">0</span></span>
+        </div>
+
+        <div class="controls-section">
+            <div class="button-row">
+                <button id="loadBtn" class="btn-primary">📥 Load All Games (0-616)</button>
+                <div class="quick-actions">
+                    <button id="openRandomBtn" class="btn-secondary" disabled>🎲 Random Game</button>
+                    <button id="clearSearchBtn" class="btn-secondary" disabled>✕ Clear Search</button>
+                    <button id="exportBtn" class="btn-secondary" disabled>💾 Export List</button>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Search games by name..." disabled>
+                <select id="sortSelect" class="sort-select" disabled>
+                    <option value="name">Sort: Name</option>
+                    <option value="index">Sort: Index</option>
+                </select>
+                <div class="view-toggle">
+                    <button class="view-btn active" id="gridViewBtn" data-view="grid">⊞ Grid</button>
+                    <button class="view-btn" id="listViewBtn" data-view="list">≡ List</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="favoritesContainer" class="favorites-container" style="display: none;">
+            <div class="favorites-title">
+                ⭐ Favorites
+                <button id="clearFavBtn" class="btn-secondary" style="padding: 5px 10px; font-size: 11px;">Clear All</button>
+            </div>
+            <div id="favoritesList" class="favorites-grid"></div>
+        </div>
+
+        <div id="resultsInfo" class="results-info" style="display: none;">
+            <div id="resultsText"></div>
+        </div>
+
+        <div id="noResults" class="no-results" style="display: none;">No games found matching your search.</div>
+
+        <div id="gameContainer" class="button-grid"></div>
+
+        <div class="info-banner">
+            <p><strong>ℹ️ Features:</strong></p>
+            <p>✨ Load 617 games • 🔍 Smart search • ⭐ Save favorites • 🎲 Random game • 💾 Export list • 📊 Grid & List view • 🔤 Sort options</p>
+            <div id="loadingInfo" class="loading" style="display: none;">
+                <p>Loading games...</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+                <div class="stats">
+                    <p>Loaded: <span id="loadedCount">0</span>/617</p>
+                    <p id="currentGame">Processing...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gameContainer = document.getElementById('gameContainer');
+        const loadBtn = document.getElementById('loadBtn');
+        const loadingInfo = document.getElementById('loadingInfo');
+        const progressFill = document.getElementById('progressFill');
+        const loadedCount = document.getElementById('loadedCount');
+        const currentGame = document.getElementById('currentGame');
+        const searchInput = document.getElementById('searchInput');
+        const sortSelect = document.getElementById('sortSelect');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
+        const openRandomBtn = document.getElementById('openRandomBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const resultsInfo = document.getElementById('resultsInfo');
+        const noResults = document.getElementById('noResults');
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const listViewBtn = document.getElementById('listViewBtn');
+        const favoritesContainer = document.getElementById('favoritesContainer');
+        const favoritesList = document.getElementById('favoritesList');
+        const clearFavBtn = document.getElementById('clearFavBtn');
+        const gameCountBadge = document.getElementById('gameCountBadge');
+        const loadedCountBadge = document.getElementById('loadedCountBadge');
+
+        const baseUrl = 'https://cdn.jsdelivr.net/gh/gn-math/html@main/';
+
+        let gamesData = [];
+        let favorites = JSON.parse(localStorage.getItem('gameFavorites')) || [];
+        let currentView = 'grid';
+
+        // Update favorites display
+        function updateFavoritesDisplay() {
+            if (favorites.length === 0) {
+                favoritesContainer.style.display = 'none';
+                return;
+            }
+
+            favoritesContainer.style.display = 'block';
+            favoritesList.innerHTML = '';
+
+            favorites.forEach(fav => {
+                const game = gamesData.find(g => g.index === fav);
+                if (game) {
+                    const btn = document.createElement('button');
+                    btn.className = 'fav-btn';
+                    btn.textContent = game.title.length > 12 ? game.title.substring(0, 12) + '...' : game.title;
+                    btn.title = game.title;
+                    btn.addEventListener('click', () => openGame(game));
+                    
+                    const removeBtn = document.createElement('span');
+                    removeBtn.style.cursor = 'pointer';
+                    removeBtn.style.marginLeft = '4px';
+                    removeBtn.innerHTML = '✕';
+                    removeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        favorites = favorites.filter(f => f !== fav);
+                        localStorage.setItem('gameFavorites', JSON.stringify(favorites));
+                        updateFavoritesDisplay();
+                        updateAllButtons();
+                    });
+
+                    btn.appendChild(removeBtn);
+                    favoritesList.appendChild(btn);
+                }
+            });
+        }
+
+        function toggleFavorite(index) {
+            if (favorites.includes(index)) {
+                favorites = favorites.filter(f => f !== index);
+            } else {
+                favorites.push(index);
+            }
+            localStorage.setItem('gameFavorites', JSON.stringify(favorites));
+            updateFavoritesDisplay();
+            updateAllButtons();
+        }
+
+        function openGame(game) {
+            const newWindow = window.open('about:blank', `game-${game.index}`);
+            newWindow.document.write(game.html);
+            newWindow.document.close();
+            newWindow.document.title = game.title;
+        }
+
+        loadBtn.addEventListener('click', async () => {
+            loadBtn.disabled = true;
+            loadingInfo.style.display = 'block';
+            gameContainer.innerHTML = '';
+            gamesData = [];
+            let successCount = 0;
+
+            for (let i = 0; i <= 616; i++) {
+                try {
+                    const gameUrl = `${baseUrl}${i}.html`;
+                    const response = await fetch(gameUrl);
+                    
+                    if (response.ok) {
+                        const htmlContent = await response.text();
+                        let gameTitle = extractGameTitle(htmlContent, i);
+                        
+                        gamesData.push({
+                            index: i,
+                            title: gameTitle,
+                            html: htmlContent
+                        });
+                        
+                        createGameButton(i, gameTitle, htmlContent);
+                        successCount++;
+                    }
+                } catch (error) {
+                    console.error(`Failed to load game ${i}:`, error);
+                }
+
+                const progress = Math.round(((i + 1) / 617) * 100);
+                progressFill.style.width = progress + '%';
+                progressFill.textContent = progress + '%';
+                loadedCount.textContent = successCount;
+                currentGame.textContent = `Processing game ${i}...`;
+            }
+
+            loadingInfo.style.display = 'none';
+            loadBtn.disabled = false;
+            searchInput.disabled = false;
+            sortSelect.disabled = false;
+            clearSearchBtn.disabled = false;
+            openRandomBtn.disabled = false;
+            exportBtn.disabled = false;
+            gameCountBadge.style.display = 'inline-block';
+            loadedCountBadge.textContent = successCount;
+            updateFavoritesDisplay();
+        });
+
+        function extractGameTitle(htmlContent, index) {
+            let titleMatch = htmlContent.match(/<title>(.*?)<\/title>/i);
+            if (titleMatch && titleMatch[1].trim() && titleMatch[1].trim().length > 0) {
+                return titleMatch[1].trim();
+            }
+
+            titleMatch = htmlContent.match(/<meta\s+property=["']og:title["']\s+content=["'](.*?)["']/i);
+            if (titleMatch && titleMatch[1].trim()) {
+                return titleMatch[1].trim();
+            }
+
+            titleMatch = htmlContent.match(/window\.config\s*=\s*\{[^}]*title:\s*["'](.*?)["']/i);
+            if (titleMatch && titleMatch[1].trim()) {
+                return titleMatch[1].trim();
+            }
+
+            titleMatch = htmlContent.match(/productName:\s*["'](.*?)["']/i);
+            if (titleMatch && titleMatch[1].trim()) {
+                return titleMatch[1].trim();
+            }
+
+            titleMatch = htmlContent.match(/<h1[^>]*>(.*?)<\/h1>/i);
+            if (titleMatch && titleMatch[1].trim()) {
+                const cleaned = titleMatch[1].replace(/<[^>]*>/g, '').trim();
+                if (cleaned) return cleaned;
+            }
+
+            return `Game ${index}`;
+        }
+
+        function createGameButton(index, title, htmlContent) {
+            const btn = document.createElement('button');
+            btn.className = 'game-btn';
+            btn.dataset.title = title.toLowerCase();
+            btn.dataset.index = index;
+            btn.title = title;
+            
+            const isFav = favorites.includes(index);
+            const star = isFav ? '⭐' : '☆';
+            
+            btn.innerHTML = `<span>${title.length > 15 ? title.substring(0, 15) + '...' : title}</span><span class="game-btn-index">${star}</span>`;
+            btn.style.background = `linear-gradient(135deg, hsl(${(index * 2) % 360}, 70%, 60%), hsl(${(index * 2 + 60) % 360}, 70%, 60%))`;
+            
+            btn.addEventListener('click', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    toggleFavorite(index);
+                } else {
+                    openGame({index, title, html: htmlContent});
+                }
+            });
+
+            btn.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                toggleFavorite(index);
+            });
+
+            gameContainer.appendChild(btn);
+        }
+
+        function updateAllButtons() {
+            document.querySelectorAll('.game-btn').forEach(btn => {
+                const index = parseInt(btn.dataset.index);
+                const isFav = favorites.includes(index);
+                const star = isFav ? '⭐' : '☆';
+                const titleSpan = btn.querySelector('span:first-child');
+                btn.querySelector('span:last-child').textContent = star;
+            });
+        }
+
+        searchInput.addEventListener('input', performSearch);
+
+        function performSearch() {
+            const query = searchInput.value.toLowerCase().trim();
+            let matchCount = 0;
+
+            const buttons = Array.from(document.querySelectorAll('.game-btn'));
+            buttons.forEach(btn => {
+                const title = btn.dataset.title || '';
+                if (title.includes(query) || query === '') {
+                    btn.classList.remove('hidden');
+                    matchCount++;
+                } else {
+                    btn.classList.add('hidden');
+                }
+            });
+
+            if (matchCount === 0 && query) {
+                noResults.style.display = 'block';
+                resultsInfo.style.display = 'none';
+            } else if (query) {
+                noResults.style.display = 'none';
+                resultsInfo.style.display = 'flex';
+                document.getElementById('resultsText').textContent = `Found ${matchCount} game(s)`;
+            } else {
+                noResults.style.display = 'none';
+                resultsInfo.style.display = 'none';
+            }
+        }
+
+        sortSelect.addEventListener('change', () => {
+            const sortBy = sortSelect.value;
+            const buttons = Array.from(gameContainer.querySelectorAll('.game-btn:not(.hidden)'));
+            
+            if (sortBy === 'name') {
+                buttons.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title));
+            } else if (sortBy === 'index') {
+                buttons.sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index));
+            }
+
+            buttons.forEach(btn => gameContainer.appendChild(btn));
+        });
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            performSearch();
+        });
+
+        openRandomBtn.addEventListener('click', () => {
+            if (gamesData.length > 0) {
+                const randomGame = gamesData[Math.floor(Math.random() * gamesData.length)];
+                openGame(randomGame);
+            }
+        });
+
+        exportBtn.addEventListener('click', () => {
+            const list = gamesData.map(g => `${g.index}: ${g.title}`).join('\n');
+            const blob = new Blob([list], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'games_list.txt';
+            a.click();
+        });
+
+        clearFavBtn.addEventListener('click', () => {
+            if (confirm('Clear all favorites?')) {
+                favorites = [];
+                localStorage.setItem('gameFavorites', JSON.stringify(favorites));
+                updateFavoritesDisplay();
+                updateAllButtons();
+            }
+        });
+
+        gridViewBtn.addEventListener('click', () => {
+            currentView = 'grid';
+            gameContainer.classList.remove('list-view');
+            gridViewBtn.classList.add('active');
+            listViewBtn.classList.remove('active');
+        });
+
+        listViewBtn.addEventListener('click', () => {
+            currentView = 'list';
+            gameContainer.classList.add('list-view');
+            listViewBtn.classList.add('active');
+            gridViewBtn.classList.remove('active');
+        });
+
+        updateFavoritesDisplay();
+    </script>
+</body>
+</html>
